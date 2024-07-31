@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Summarization</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Text Summarization</h1>
+        <form id="summarization-form">
+            <textarea name="text" id="text" placeholder="Enter your text here..." required></textarea>
+            <input type="number" name="max_length" id="max_length" placeholder="Max Length" required>
+            <input type="number" name="min_length" id="min_length" placeholder="Min Length" required>
+            <button type="submit">Summarize</button>
+        </form>
+        <div id="summary"></div>
+    </div>
+    <script>
+        document.getElementById('summarization-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const text = document.getElementById('text').value;
+            const max_length = document.getElementById('max_length').value;
+            const min_length = document.getElementById('min_length').value;
+
+            fetch('/summarize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: text, max_length: max_length, min_length: min_length }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('summary').innerHTML = `<h2>Error</h2><p>${data.error}</p>`;
+                } else {
+                    document.getElementById('summary').innerHTML = `<h2>Summary</h2><p>${data.summary}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
